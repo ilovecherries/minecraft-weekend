@@ -2,9 +2,11 @@
 
 #include "../state.h"
 #include "../ui/ui.h"
+#include "GLFW/glfw3.h"
 
 static void update(struct ControlComponent *c_control, struct Entity entity) {
     struct CameraComponent *c_camera = ecs_get(entity, C_CAMERA);
+    struct MovementComponent *c_movement = ecs_get(entity, C_MOVEMENT);
 
     c_camera->camera.pitch -= state.window->mouse.delta.y /
                               (((f32)state.window->frame_delta) /
@@ -14,6 +16,15 @@ static void update(struct ControlComponent *c_control, struct Entity entity) {
     c_camera->camera.yaw -= state.window->mouse.delta.x /
                             (((f32)state.window->frame_delta) /
                              (c_control->mouse_sensitivity * 15000.0f));
+    const animationSpeed = 3.0f;
+    if (c_movement->flags.sprinting)
+        c_camera->camera.animationTimer = min(20.0f, c_camera->camera.animationTimer+animationSpeed);
+    else
+        c_camera->camera.animationTimer = max(-12.0f, c_camera->camera.animationTimer-animationSpeed);
+    if (c_camera->camera.animationTimer >= 0)
+        c_camera->camera.fov = radians(75.0f + c_camera->camera.animationTimer);
+    else
+        c_camera->camera.fov = radians(75.0f);
 }
 
 static void tick(struct ControlComponent *c_control, struct Entity entity) {
@@ -28,6 +39,8 @@ static void tick(struct ControlComponent *c_control, struct Entity entity) {
     
     c_movement->directions.up = state.window->keyboard.keys[GLFW_KEY_SPACE].down;
     c_movement->directions.down = state.window->keyboard.keys[GLFW_KEY_LEFT_SHIFT].down;
+
+    c_movement->flags.sprinting = state.window->keyboard.keys[GLFW_KEY_LEFT_SHIFT].down;
 
     if (state.window->keyboard.keys[GLFW_KEY_K].pressed_tick) {
         c_movement->flags.flying = !c_movement->flags.flying;

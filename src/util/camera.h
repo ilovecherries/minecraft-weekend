@@ -21,6 +21,7 @@ struct PerspectiveCamera {
     struct ViewProj view_proj;
     vec3s position, direction, up, right;
     f32 pitch, yaw, fov, aspect, znear, zfar;
+    f32 animationTimer;
 };
 
 void perspective_camera_init(struct PerspectiveCamera *self, f32 fov);

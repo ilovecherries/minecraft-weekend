@@ -13,11 +13,12 @@ static void tick(struct MovementComponent *c_movement, struct Entity entity) {
                      world_pos_to_block(glms_vec3_add(c_position->position,
                                                       (vec3s) {{ 0.0f, c_physics->size[1].y, 0.0f }})))];
 
-    const f32 speed = 0.0245f * c_movement->speed * (c_movement->flags.flying ? 1.8f : 1.0f);
+    const f32 speed = 0.0245f * c_movement->speed * (c_movement->flags.flying ? 1.8f : 1.0f) * (c_movement->flags.sprinting ? 1.6f : 1.0f);
 
     vec3s movement, direction, forward, right;
     movement = GLMS_VEC3_ZERO;
     direction = GLMS_VEC3_ZERO;
+
     forward = (vec3s){{sinf(c_camera->camera.yaw), 0, cosf(c_camera->camera.yaw)}};
     right = glms_vec3_cross((vec3s){{0.0f, 1.0f, 0.0f}}, forward);
 
